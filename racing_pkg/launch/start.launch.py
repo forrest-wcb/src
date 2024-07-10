@@ -9,13 +9,19 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
+    """
+    生成启动描述的函数
+    """
 
+    # 包含hobot_usb_cam.launch.py文件的节点
     usb_node = IncludeLaunchDescription(PythonLaunchDescriptionSource(get_package_share_directory('hobot_usb_cam') + '/launch/hobot_usb_cam.launch.py'),
                                         launch_arguments={'usb_image_width': '640', 'usb_image_height': '480',
                                                             'usb_video_device': '/dev/video8'}.items())
     
+    # 包含origincar_bringup.launch.py文件的节点
     base_node = IncludeLaunchDescription(PythonLaunchDescriptionSource(get_package_share_directory('origincar_base') + '/launch/origincar_bringup.launch.py'))
 
+    # qrdecoder节点
     qrdecode_node = Node(
         package='qrdecoder',
         executable='decoder_node',
@@ -23,6 +29,7 @@ def generate_launch_description():
         
     )
 
+    # line_follow节点
     line_follow_node = Node(
         package='line_follow',
         executable='line_follow',
@@ -30,12 +37,15 @@ def generate_launch_description():
         
     )
 
+    # racing_pkg节点
     racing_pkg_node = Node(
         package='racing_pkg',
         executable='racing_state',
         output='screen',
         
     )
+
+    # ros2_web_bridge节点
     ros2_web_bridge_node = ExecuteProcess(
         cmd=[
             'ros2',
@@ -54,4 +64,3 @@ def generate_launch_description():
         racing_pkg_node,
         ros2_web_bridge_node
     ])
-
