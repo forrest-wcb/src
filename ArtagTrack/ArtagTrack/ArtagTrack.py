@@ -18,11 +18,11 @@ class MinimalSubscriber(Node):
 
     def listener_callback(self, msg):
    #****************处理msg获取中心坐标点***************#
-        Middle_point_x = 
-        Middle_point_y = 
+        Middle_point_x = None
+        Middle_point_y = None
    #****************根据图像尺寸大小选择图像中心点坐标***************#
-        Targer_point_x =
-        Target_point_y = 
+        Targer_point_x = None
+        Target_point_y = None
         pos_error = Targer_point_x - Middle_point_x
         Kp = 2.5
         Ki = 0

@@ -15,7 +15,7 @@ class Follower(Node):
         self.get_logger().info("Subscribed to /image")
 
         self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.get_logger().info("Subscribed to /cmd_vel")
+        self.get_logger().info("Published to /cmd_vel")
 
         self.pub = self.create_publisher(CompressedImage, '/camera/process_image', 10)
         self.get_logger().info("Published to /camera/process_image")

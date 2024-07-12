@@ -13,7 +13,7 @@ class Shooter(Node):
         super().__init__('image_shooter')
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = self.create_subscription(CompressedImage, '/image', self.image_callback, 10)
-        self.timer = self.create_timer(0.5,self.timer_callback)
+        self.timer = self.create_timer(0.3,self.timer_callback)
         self.image = numpy.matrix(0)
         self._last_shot_time = time.time()
         self.get_logger().info("Image shooter init finished.")
