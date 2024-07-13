@@ -17,19 +17,18 @@ class MinimalSubscriber(Node):
         self.last_pose_error = 0
 
     def listener_callback(self, msg):
-        pass
-#    #****************处理msg获取中心坐标点***************#
-#         Middle_point_x = 
-#         Middle_point_y = 
-#    #****************根据图像尺寸大小选择图像中心点坐标***************#
-#         Targer_point_x =
-#         Target_point_y = 
-#         pos_error = Targer_point_x - Middle_point_x
-#         Kp = 2.5
-#         Ki = 0
-#         Kd = 0
-#         turn_anger = Kp * pos_error + Kd *(pos_error-self.last_pose_error)#计算转角
-#         self.last_pose_error = pos_error
+   #****************处理msg获取中心坐标点***************#
+        Middle_point_x = None
+        Middle_point_y = None
+   #****************根据图像尺寸大小选择图像中心点坐标***************#
+        Targer_point_x = None
+        Target_point_y = None
+        pos_error = Targer_point_x - Middle_point_x
+        Kp = 2.5
+        Ki = 0
+        Kd = 0
+        turn_anger = Kp * pos_error + Kd *(pos_error-self.last_pose_error)#计算转角
+        self.last_pose_error = pos_error
         
 
 
