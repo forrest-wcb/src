@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int32  # 使用标准消息类型
+from origincar_msg.msg import Sign
 
 class ListenerNode(Node):
 
@@ -12,19 +13,21 @@ class ListenerNode(Node):
             self.listener_callback,
             10  # 队列大小
         )
-        self.state_publisher = self.create_publisher(Int32, 'sign_foxglove', 10)
+        self.state_publisher = self.create_publisher(Sign, 'sign_foxglove', 10)
 
     def listener_callback(self, msg):
-        #state = Int32()
+        state = Sign()
         if msg.data == 5:
-            #state.data = 5
+            state.sign_data = 5
             self.get_logger().info('开始遥测')
-            self.state_publisher.publish(msg)
+            self.state_publisher.publish(state)
         elif msg.data == 6:
+            state.sign_data = 6
             self.get_logger().info('结束遥测')
-            self.state_publisher.publish(msg)
+            self.state_publisher.publish(state)
             
-        self.get_logger().info(f'I heard: "{msg.data}"')
+        self.get_logger().info(f'上位机发布了 "{msg.data}"')
+        self.get_logger().info(f'发布到信号: {state.sign_data}')
         
 
 
