@@ -2,19 +2,36 @@ import rclpy
 from rclpy.node import Node 
 from ai_msgs.msg import PerceptionTargets 
 from geometry_msgs.msg import Twist
+from origincar_msg.msg import Point
  
+
+#参数设定
+y_bottom_threshold = 350.0 #避障阈值
+confidence_threshold = 0.5 #置信度阈值
+
+follow_angular_ratio = -1.0 #巡线速度变化系数
+avoid_angular_ratio = 1.0 #避障角速度变化系数
+
+follow_linear_speed = 0.5 #循线速度
+avoid_linear_speed = 0.5 #避障线速度
+
+
+
 class TargetSubscriber(Node): 
     def __init__(self): 
         super().__init__('racing_control') 
         self.subscription = self.create_subscription( 
             PerceptionTargets, 
             'hobot_dnn_detection',  
-            self.racing_control, 
+            self.obstacle_avoidance, 
             10) 
-         
-        # self.subscription  # prevent unused variable warning 
-        # self.count = 0
         
+        self.subscription = self.create_subscription( 
+            Point, 
+            'line_point_detection',  
+            self.line_follow, 
+            10)
+         
         self.cmd_vel_pub = self.create_publisher(
             Twist, 
             'cmd_vel', 
@@ -22,7 +39,32 @@ class TargetSubscriber(Node):
         self.twist = Twist()
         self.get_logger().info("Node Initialized successfully")
 
-    def racing_control(self, msg): 
+    def line_follow(self,msg):
+        
+        offset = msg.line_point_x - 320
+        p = msg.confidence
+        
+        #添加死区特性
+        if -20 < offset < 20:
+            offset = 0
+
+        
+        self.twist.linear.x = follow_linear_speed
+        self.twist.angular.z = follow_angular_ratio * offset / 150 * msg.line_point_y / 224
+               
+        self.cmd_vel_pub.publish(self.twist)    
+            
+
+    #判断循线或是避障(True避False循)
+    def judge(self, y_bottom, y_bottom_threshold, confidence, confidence_threshold):
+        
+        if y_bottom > y_bottom_threshold and confidence> confidence_threshold:
+            return True
+        else:
+            self.get_logger().info("Not avoiding")
+            return False
+    
+    def obstacle_avoidance(self, msg): 
                 
         # print(f"\n \033[31m---\033[0m This Frame: FPS = {msg.fps}  \033[31m---\033[0m")
         # for num, target in enumerate(msg.targets):
@@ -33,14 +75,7 @@ class TargetSubscriber(Node):
         #     target.rois[0].rect.height,
         #     target.rois[0].rect.width,
         #     target.rois[0].confidence))
-        
-        #避障参数设定
-        y_bottom_threshold = 350.0 #避障阈值
-        confidence_threshold = 0.5 #置信度阈值
-        avoid_angular_ratio = 1.0 #角速度变化系数
-        avoid_linear_speed = 0.1 #线速度
-        
-        
+    
         #判断是否识别到
         if not msg.targets:
             self.get_logger().info("No Obstacle")
@@ -68,30 +103,29 @@ class TargetSubscriber(Node):
         #获取底部y坐标
         y_bottom = float(msg.targets[max_area_num].rois[0].rect.y_offset + msg.targets[max_area_num].rois[0].rect.height)
         
+        #获取置信度
+        confidence = msg.targets[max_area_num].rois[0].confidence
+        
         #判断是否进行避障
         
-        if y_bottom > y_bottom_threshold and msg.targets[0].rois[0].confidence> confidence_threshold  :
-            pass
-        else:
-            self.get_logger().info("Not avoiding")
-            return
+        if self.judge(y_bottom, y_bottom_threshold, confidence, confidence_threshold):
         
-        #计算误差
-        temp = x_center - 320.0
-        
-        # 添加饱和特性
-        if temp >= 0 and temp < 20:
-            temp = 20
-        elif temp < 0 and temp > -20:
-            temp = -20
+            #计算误差
+            temp = x_center - 320.0
             
-        #计算角速度
-        self.twist.angular.z = avoid_angular_ratio * 700 / temp
-        self.twist.linear.x = avoid_linear_speed
-        
-        self.cmd_vel_pub.publish(self.twist)        
-        
-        self.get_logger().info("Avoiding")
+            # 添加饱和特性
+            if temp >= 0 and temp < 20:
+                temp = 20
+            elif temp < 0 and temp > -20:
+                temp = -20
+                
+            #计算角速度
+            self.twist.angular.z = avoid_angular_ratio * 700 / temp
+            self.twist.linear.x = avoid_linear_speed
+            
+            self.cmd_vel_pub.publish(self.twist)        
+            
+            self.get_logger().info("Avoiding")
         
         
             

@@ -31,7 +31,7 @@ def generate_launch_description():
 
     # line_follow节点
     line_follow_node = Node(
-        package='line_follow',
+        package='line_follow_cv',
         executable='line_follow',
         output='screen',
         

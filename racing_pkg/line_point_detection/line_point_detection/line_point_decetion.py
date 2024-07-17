@@ -31,14 +31,14 @@ class LineFollower(Node):
         
         x, y, p = process_frame(cv_image, models, 640, 480)
            
-        if p>0.5:
-            point = Point()
-            point.line_point = x
+        
+        point = Point()
+        point.line_point = x
+        point.confidence = p
+        self.line_point_pub.publish(point)
+        self.get_logger().info("line point is published")
             
-            self.line_point_pub.publish(point)
-            self.get_logger().info("line point is published")
-            
-        self.get_logger().info("No Point") 
+        # self.get_logger().info("No Point") 
 
 def bgr2nv12_opencv(image):
     height, width = image.shape[0], image.shape[1]
