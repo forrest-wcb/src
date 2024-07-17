@@ -33,14 +33,18 @@ class DecoderNode(Node):
             '/sign_switch',
             10)
         
+        self.matched = False
         # self.cmd_vel_pub = self.create_publisher(
         #     Twist, 
         #     'cmd_vel', 
         #     10)
 
+        self.send_foxglove_signal(1)
+        
     def send_foxglove_signal(self, signal_value): #上位机信号
         msg = Sign()
         msg.sign_data = signal_value
+        
         self.foxstate_publisher.publish(msg)
         self.get_logger().info(f"上位机信号发布了{msg.sign_data}")
         
@@ -74,23 +78,28 @@ class DecoderNode(Node):
                 # self.qrstate_publisher.publish(state)
                 self.send_car_signal(3)
                 self.get_logger().info("ClockWise")
+                self.matched = True
+                self.send_foxglove_signal(2)
                 
             elif data_value == "AntiClockWise" :
                 # state.sign_data = 4
                 # self.qrstate_publisher.publish(state)
                 self.send_car_signal(4)
                 self.get_logger().info("AntiClockWise")
+                self.matched = True
+                self.send_foxglove_signal(2)
                 
             # fox_state.data = 2
             # self.foxstate_publisher.publish(fox_state)
-            self.send_foxglove_signal(2)
+            # self.send_foxglove_signal(2)
             
             # self.get_logger().info(f"接收到{data_value},发布了{state.sign_data}")
            
             self.destroy_node()
             
         else: 
-            self.send_foxglove_signal(1)
+            pass
+            #self.send_foxglove_signal(1)
             # fox_state.data = 1
             # self.foxstate_publisher.publish(fox_state)
             # self.get_logger().info("No Match")
