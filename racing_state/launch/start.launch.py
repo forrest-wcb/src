@@ -37,9 +37,9 @@ def generate_launch_description():
         
     )
 
-    # racing_pkg节点
-    racing_pkg_node = Node(
-        package='racing_pkg',
+    # racing_state节点
+    racing_state_node = Node(
+        package='racing_state',
         executable='racing_state',
         output='screen',
         
@@ -61,6 +61,6 @@ def generate_launch_description():
         base_node,
         qrdecode_node,
         line_follow_node,
-        racing_pkg_node,
+        racing_state_node,
         ros2_web_bridge_node
     ])

@@ -6,7 +6,7 @@ from origincar_msg.msg import Sign
 class ListenerNode(Node):
 
     def __init__(self):
-        super().__init__('listener_node')
+        super().__init__('racing_state')
         self.subscription = self.create_subscription(
             Int32,  # 消息类型
             '/sign4return',  # 订阅的话题名

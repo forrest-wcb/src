@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'obstacle_avoidence'
+package_name = 'racing_control'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'obstacle_avoidence = obstacle_avoidence.obstacle_avoidence:main',
+            'racing_control = racing_control.racing_control:main',
         ],
     },
 )

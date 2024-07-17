@@ -1,7 +1,7 @@
 from setuptools import setup
 import os
 from glob import glob
-package_name = 'racing_pkg'
+package_name = 'racing_state'
 
 setup(
     name=package_name,
@@ -22,7 +22,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'racing_state = racing_pkg.racing_state:main'
+            'racing_state = racing_state.racing_state:main'
         ],
     },
 )

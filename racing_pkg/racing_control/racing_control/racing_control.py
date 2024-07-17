@@ -5,11 +5,11 @@ from geometry_msgs.msg import Twist
  
 class TargetSubscriber(Node): 
     def __init__(self): 
-        super().__init__('obstacle_avoidence') 
+        super().__init__('racing_control') 
         self.subscription = self.create_subscription( 
             PerceptionTargets, 
             'hobot_dnn_detection',  
-            self.obstacle_avoidence, 
+            self.racing_control, 
             10) 
          
         # self.subscription  # prevent unused variable warning 
@@ -22,7 +22,7 @@ class TargetSubscriber(Node):
         self.twist = Twist()
         self.get_logger().info("Node Initialized successfully")
 
-    def obstacle_avoidence(self, msg): 
+    def racing_control(self, msg): 
                 
         # print(f"\n \033[31m---\033[0m This Frame: FPS = {msg.fps}  \033[31m---\033[0m")
         # for num, target in enumerate(msg.targets):
@@ -99,14 +99,14 @@ class TargetSubscriber(Node):
  
 def main(args=None): 
     rclpy.init(args=args) 
-    obstacle_avoidence = TargetSubscriber() 
+    racing_control = TargetSubscriber() 
     
     try:
-        rclpy.spin(obstacle_avoidence)
+        rclpy.spin(racing_control)
     except KeyboardInterrupt:
-        obstacle_avoidence.get_logger().warn('Avoidence exit.')
+        racing_control.get_logger().warn('Avoidence exit.')
     finally:
-        obstacle_avoidence.destroy_node()
+        racing_control.destroy_node()
     
     rclpy.shutdown() 
 
