@@ -25,6 +25,7 @@ find_package(std_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Data.msg"
   "msg/Sign.msg"
+  "msg/Point.msg"
   DEPENDENCIES std_msgs
   ADD_LINTER_TESTS
 )

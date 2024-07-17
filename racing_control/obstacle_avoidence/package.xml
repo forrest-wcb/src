@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>obstacle_avoidence</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="2410485087@qq.com">root</maintainer>
+  <maintainer email="paradise_wcb@whut.edu.cn">root</maintainer>
   <license>TODO: License declaration</license>
 
   <depend>rclcpp</depend>
