@@ -34,8 +34,8 @@ class TargetSubscriber(Node):
         #     target.rois[0].rect.width,
         #     target.rois[0].confidence))
         
-        #参数设定
-        y_bottom_threshold = 350.0 #底部y坐标阈值
+        #避障参数设定
+        y_bottom_threshold = 350.0 #避障阈值
         confidence_threshold = 0.5 #置信度阈值
         avoid_angular_ratio = 1.0 #角速度变化系数
         avoid_linear_speed = 0.1 #线速度
