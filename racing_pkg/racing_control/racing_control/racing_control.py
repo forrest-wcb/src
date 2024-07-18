@@ -5,14 +5,14 @@ from geometry_msgs.msg import Twist
 from origincar_msg.msg import Point
 
 # 参数设定
-y_bottom_threshold = 350.0  # 避障阈值
+y_bottom_threshold = 380.0  # 避障阈值
 confidence_threshold = 0.5  # 置信度阈值
 
 follow_angular_ratio = -1.0  # 巡线速度变化系数
 avoid_angular_ratio = 1.0  # 避障角速度变化系数
 
-follow_linear_speed = 0.5  # 循线速度
-avoid_linear_speed = 0.5  # 避障线速度
+follow_linear_speed = 0.7  # 循线速度
+avoid_linear_speed = 0.4  # 避障线速度
 
 
 class TargetSubscriber(Node):
@@ -34,22 +34,28 @@ class TargetSubscriber(Node):
             Twist,
             'cmd_vel',
             10)
+        
         self.twist = Twist()
         self.avoid_obstacle = False
+        
         self.get_logger().info("Node Initialized successfully")
 
-    def perception_callback(self, msg):
+    def perception_callback(self, msg: PerceptionTargets):
         self.avoid_obstacle = self.judge(msg)
         if self.avoid_obstacle:
             self.obstacle_avoidance(msg)
             self.get_logger().info("Avoiding")
+            
 
     def line_follow_callback(self, msg):
+        # self.get_logger().info("wcb")
         if not self.avoid_obstacle:
             self.line_follow(msg)
             self.get_logger().info("Following")
 
-    def line_follow(self, msg):
+    def line_follow(self, msg: Point):
+        # self.get_logger().info("Following")
+    # if msg.confidence > 0.5 :
         offset = msg.line_point_x - 320
         p = msg.confidence
         y = msg.line_point_y
@@ -58,9 +64,10 @@ class TargetSubscriber(Node):
             offset = 0
 
         self.twist.linear.x = follow_linear_speed
-        self.twist.angular.z = follow_angular_ratio * offset / 150 * y / 224
-
+        # self.twist.angular.z = follow_angular_ratio * offset / 150 * y / 224
+        self.twist.angular.z = follow_angular_ratio * offset / 400 
         self.cmd_vel_pub.publish(self.twist)
+        
 
     # 判断循线或是避障(True避False循)
     def judge(self, msg):

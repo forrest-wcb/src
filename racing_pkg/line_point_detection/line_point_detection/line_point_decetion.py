@@ -9,7 +9,7 @@ import cv2 , cv_bridge
 import time
 
 # 加载模型
-models = dnn.load('/root/dev_ws/src/racing_pkg/line_point_detection/resnet18_224x224_nv12.bin')
+models = dnn.load('/root/dev_ws/src/racing_pkg/line_point_detection/line_tracking.bin')
 
 class LineFollower(Node):
     def __init__(self):
@@ -19,7 +19,9 @@ class LineFollower(Node):
         
         self.img_sub = self.create_subscription(CompressedImage, '/image', self.img_callback, 10)
         
-        self.line_point_pub = self.create_publisher(Point, '/line_point', 10)        
+        self.line_point_pub = self.create_publisher(Point, '/line_point_detection', 10)        
+        
+        self.pub = self.create_publisher(CompressedImage, '/process_image', 10)
         
         self.get_logger().info("initialize successfully")
         
@@ -28,18 +30,21 @@ class LineFollower(Node):
     def img_callback(self,msg):
         # self.get_logger().info("Following")
         cv_image = self.bridge.compressed_imgmsg_to_cv2(msg, 'bgr8')
-        
-        x, y, p = process_frame(cv_image, models, 640, 480)
+        crop_image = cv_image[-224:,:]
+        x, y, p = process_frame(crop_image, models, 640, 480)
            
         
         point = Point()
         point.line_point_x = x
-        point.line_point_y
+        point.line_point_y = y
         point.confidence = p
         
+        
         self.line_point_pub.publish(point)
-        self.get_logger().info("line point is published")
-            
+        self.get_logger().info(f"line point {int(point.line_point_x)},{int(point.line_point_y)},{int(point.confidence)}")
+        
+        cv2.circle(cv_image, (int(x), int(y)), radius=5, color=(0, 0, 255), thickness=-1)
+        self.pub.publish(self.bridge.cv2_to_compressed_imgmsg(cv_image))
         # self.get_logger().info("No Point") 
 
 def bgr2nv12_opencv(image):
@@ -54,21 +59,21 @@ def bgr2nv12_opencv(image):
     nv12[height * width:] = uv_packed
     return nv12
 
-def print_properties(pro):
-    print("tensor type:", pro.tensor_type)
-    print("data type:", pro.dtype)
-    print("layout:", pro.layout)
-    print("shape:", pro.shape)
+# def print_properties(pro):
+#     print("tensor type:", pro.tensor_type)
+#     print("data type:", pro.dtype)
+#     print("layout:", pro.layout)
+#     print("shape:", pro.shape)
 
 def process_frame(cv_image , models , ori_width , ori_height):
     
-    cv_image_resized = cv2.resize(cv_image, (224, 224), interpolation=cv2.INTER_NEAREST) #最近邻插值方法进行缩放
+    cv_image_resized = cv2.resize(cv_image, (224, 224), interpolation=cv2.INTER_LINEAR) #最近邻插值方法进行缩放
     
     nv12_image = bgr2nv12_opencv(cv_image_resized)
     #nv12_image = convert_bgr_to_nv12(cv_image_resized)
     
     #outputs = models[0].forward(nv12_image)
-    outputs = models[0].forward(np.frombuffer(nv12_image, dtype=np.uint8))
+    outputs = models[0].forward(nv12_image)
     outputs = outputs[0].buffer
     
     x_ratio, y_ratio, confidence = outputs[0][0][0][0], outputs[0][1][0][0], outputs[0][2][0][0]
