@@ -23,7 +23,7 @@ class Follower(Node):
         self.foxglove_sub = self.create_subscription(Sign, "/sign_foxglove", self.pause_callback, 10)
 
         self.twist = Twist()
-        self.paused = False
+        self.paused = True
 
         # 添加暂停订阅器
         # self.pause_sub = self.create_subscription(Int32, 'sign_foxglove', self.pause_callback, 10)
@@ -36,7 +36,7 @@ class Follower(Node):
             self.twist.linear.x = 0.0
             self.twist.angular.z = 0.0
             self.cmd_vel_pub.publish(self.twist)
-        else:
+        elif msg.sign_data in (0,6):
             self.paused = False
             self.get_logger().info("Unpaused")
             self.get_logger().info("Following...")

@@ -3,7 +3,6 @@
 
 import rclpy, cv2, cv_bridge, numpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 import time
 
@@ -20,10 +19,12 @@ class Shooter(Node):
 
     def timer_callback(self):
         current_time = time.time()
-        write_file_path = "/root/img/{}.jpg".format(current_time)
-        cv2.imwrite(write_file_path,self.image)
-        self.get_logger().info("Shot at {0}, save to {1}.".format(current_time,write_file_path))
-  
+        write_file_path = "/root/dev_ws/img/{}.jpg".format(current_time)
+        try:
+            cv2.imwrite(write_file_path,self.image)
+            self.get_logger().info("Shot at {0}, save to {1}.".format(current_time,write_file_path))
+        except Exception as e:
+            print(e)
     def image_callback(self, msg):
         self.image = self.bridge.compressed_imgmsg_to_cv2(msg,"bgr8")
         #self.image = self.bridge.imgmsg_to_cv2(msg,"bgr8")
