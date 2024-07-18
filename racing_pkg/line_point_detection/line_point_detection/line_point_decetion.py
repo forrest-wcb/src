@@ -9,7 +9,7 @@ import cv2 , cv_bridge
 import time
 
 # 加载模型
-models = dnn.load('/root/dev_ws/src/racing_control/line_point_detection/resnet18_224x224_nv12.bin')
+models = dnn.load('/root/dev_ws/src/racing_pkg/line_point_detection/resnet18_224x224_nv12.bin')
 
 class LineFollower(Node):
     def __init__(self):
@@ -33,8 +33,10 @@ class LineFollower(Node):
            
         
         point = Point()
-        point.line_point = x
+        point.line_point_x = x
+        point.line_point_y
         point.confidence = p
+        
         self.line_point_pub.publish(point)
         self.get_logger().info("line point is published")
             
@@ -71,9 +73,9 @@ def process_frame(cv_image , models , ori_width , ori_height):
     
     x_ratio, y_ratio, confidence = outputs[0][0][0][0], outputs[0][1][0][0], outputs[0][2][0][0]
     
-    x_pixel = int((x_ratio * 224.0/2 + 224.0/2) * ori_width/224.0)
-    y_pixel = int(224.0 - 224.0/2 * (y_ratio + 1) +256 )
-    
+    x_pixel = float((x_ratio * 224.0/2 + 224.0/2) * ori_width/224.0)
+    y_pixel = float(224.0 - 224.0/2 * (y_ratio + 1) +256 )
+    confidence = float(confidence)
     # print("load model time:",time_mid-time_begin)
     #print("process_frame time:",time_end-time_mid)#打印推理时间
     
